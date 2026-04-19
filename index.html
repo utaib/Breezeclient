@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Breeze Client | The Ultimate Minecraft Experience</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        /* ================= VARIABLES & RESET ================= */
+        :root {
+            --bg-base: #05050a;
+            --text-main: #ffffff;
+            --text-muted: #94a3b8;
+            --accent-blue: #3b82f6;
+            --accent-purple: #8b5cf6;
+            --glass-bg: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --success-green: #10b981;
+            --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body, html {
+            background-color: var(--bg-base);
+            color: var(--text-main);
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
+
+        ::selection {
+            background: var(--accent-purple);
+            color: white;
+        }
+
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg-base); }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--accent-purple); }
+
+        /* ================= AMBIENT BACKGROUND ================= */
+        #particles {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            z-index: -2;
+            pointer-events: none;
+        }
+
+        .ambient-glow {
+            position: fixed;
+            top: -20vh; left: -10vw;
+            width: 120vw; height: 120vh;
+            background: radial-gradient(circle at 50% 0%, rgba(59, 130, 246, 0.12), transparent 50%),
+                        radial-gradient(circle at 80% 80%, rgba(139, 92, 246, 0.08), transparent 50%);
+            z-index: -3;
+            pointer-events: none;
+        }
+
+        /* ================= LAYOUT & NAV ================= */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        nav {
+            position: fixed;
+            top: 0; left: 0; width: 100%;
+            padding: 24px 0;
+            z-index: 100;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        nav.scrolled {
+            padding: 16px 0;
+            background: rgba(5, 5, 10, 0.7);
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .nav-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-weight: 800;
+            font-size: 1.5rem;
+            letter-spacing: -0.5px;
+            background: linear-gradient(135deg, #fff, #a5b4fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-decoration: none;
+        }
+
+        .nav-links { display: flex; gap: 32px; align-items: center; }
+        .nav-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.95rem;
+            font-weight: 500;
+            transition: color 0.2s ease;
+        }
+        .nav-links a:hover { color: var(--text-main); }
+
+        /* ================= BUTTONS ================= */
+        .btn {
+            display: inline-flex; align-items: center; justify-content: center;
+            padding: 14px 32px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 1rem;
+            text-decoration: none;
+            transition: all 0.3s var(--ease-out);
+            cursor: pointer;
+            border: none;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+            color: white;
+            box-shadow: 0 10px 30px rgba(139, 92, 246, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        .btn-primary::before {
+            content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s ease;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 40px rgba(139, 92, 246, 0.4);
+        }
+        .btn-primary:hover::before { left: 100%; }
+
+        .btn-secondary {
+            background: var(--glass-bg);
+            color: white;
+            border: 1px solid var(--glass-border);
+            backdrop-filter: blur(10px);
+        }
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.08);
+            transform: translateY(-2px);
+        }
+
+        /* ================= HERO SECTION ================= */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding-top: 80px;
+            position: relative;
+        }
+
+        .hero h1 {
+            font-size: clamp(3rem, 8vw, 5.5rem);
+            font-weight: 800;
+            letter-spacing: -2px;
+            line-height: 1.1;
+            margin-bottom: 24px;
+            background: linear-gradient(to right bottom, #ffffff, #a5b4fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 0 40px rgba(139, 92, 246, 0.2));
+            opacity: 0;
+            transform: translateY(30px);
+            animation: fadeUp 1s var(--ease-out) forwards;
+        }
+
+        .hero p {
+            font-size: clamp(1.1rem, 2vw, 1.3rem);
+            color: var(--text-muted);
+            max-width: 600px;
+            margin-bottom: 48px;
+            line-height: 1.6;
+            opacity: 0;
+            transform: translateY(30px);
+            animation: fadeUp 1s var(--ease-out) 0.1s forwards;
+        }
+
+        .hero-btns {
+            display: flex; gap: 16px; flex-wrap: wrap; justify-content: center;
+            opacity: 0; transform: translateY(30px);
+            animation: fadeUp 1s var(--ease-out) 0.2s forwards;
+        }
+
+        .scroll-indicator {
+            position: absolute;
+            bottom: 40px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            opacity: 0;
+            animation: fadeUp 1s var(--ease-out) 0.5s forwards, bounce 2s infinite 1s;
+        }
+        .scroll-indicator svg { width: 20px; height: 20px; }
+
+        /* ================= GENERAL SECTION STYLES ================= */
+        .section {
+            padding: 120px 0;
+            position: relative;
+        }
+
+        .section-header {
+            text-align: center; margin-bottom: 64px;
+        }
+        .section-header h2 {
+            font-size: 2.5rem; font-weight: 700; margin-bottom: 16px; letter-spacing: -1px;
+        }
+        .section-header p { color: var(--text-muted); font-size: 1.1rem; max-width: 600px; margin: 0 auto; line-height: 1.6; }
+
+        /* ================= FEATURES SECTION ================= */
+        .features-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 24px;
+        }
+
+        .feature-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 32px;
+            backdrop-filter: blur(16px);
+            transition: all 0.4s var(--ease-out);
+            opacity: 0; transform: translateY(40px);
+        }
+        .feature-card.visible { opacity: 1; transform: translateY(0); }
+        .feature-card:hover {
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(139, 92, 246, 0.3);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4), 0 0 20px rgba(139, 92, 246, 0.1);
+        }
+
+        .feature-icon {
+            width: 48px; height: 48px;
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(139, 92, 246, 0.2));
+            border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            margin-bottom: 24px;
+            color: var(--accent-purple);
+        }
+        .feature-icon svg { width: 24px; height: 24px; }
+        .feature-card h3 { font-size: 1.2rem; margin-bottom: 12px; }
+        .feature-card p { color: var(--text-muted); font-size: 0.95rem; line-height: 1.6; }
+
+        /* ================= SHOWCASE CAROUSEL ================= */
+        .showcase-container {
+            width: 100%;
+            overflow: hidden;
+            position: relative;
+            border-radius: 24px;
+            border: 1px solid var(--glass-border);
+            background: #0a0a12;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.6), 0 0 40px rgba(139, 92, 246, 0.1);
+            opacity: 0; transform: scale(0.95);
+            transition: all 0.8s var(--ease-out);
+        }
+        .showcase-container.visible { opacity: 1; transform: scale(1); }
+
+        .carousel-track {
+            display: flex;
+            transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+            height: 600px;
+        }
+
+        .slide {
+            min-width: 100%;
+            position: relative;
+            display: flex; align-items: center; justify-content: center;
+            padding: 40px;
+            background: radial-gradient(circle at center, #1e1b4b 0%, #05050a 100%);
+        }
+
+        /* The actual screenshot wrapper */
+        .screenshot-wrapper {
+            width: 90%;
+            height: 90%;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+            overflow: hidden;
+            position: relative;
+            background: #0a0a0f;
+        }
+
+        .screenshot-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* Change to 'contain' if you prefer to show the whole window without cropping */
+            object-position: center;
+            transition: transform 3s ease;
+        }
+
+        .slide:hover .screenshot-wrapper img {
+            transform: scale(1.02);
+        }
+
+        .slide-caption {
+            position: absolute; bottom: 32px; left: 32px;
+            background: rgba(10, 10, 15, 0.8); backdrop-filter: blur(12px);
+            padding: 16px 24px; border-radius: 16px;
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            max-width: 350px;
+        }
+        .slide-caption h4 { font-size: 1.1rem; margin-bottom: 6px; color: #fff; }
+        .slide-caption p { font-size: 0.9rem; color: var(--text-muted); line-height: 1.5; }
+
+        .carousel-nav {
+            position: absolute; bottom: 32px; right: 32px;
+            display: flex; gap: 8px;
+            background: rgba(10, 10, 15, 0.5);
+            padding: 8px; border-radius: 20px; backdrop-filter: blur(10px);
+        }
+        .dot {
+            width: 10px; height: 10px; border-radius: 50%;
+            background: rgba(255,255,255,0.2); cursor: pointer; transition: 0.3s;
+        }
+        .dot.active { background: var(--accent-blue); width: 24px; border-radius: 6px; }
+
+        /* ================= SECURITY SECTION ================= */
+        .security-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+            margin-top: 40px;
+        }
+
+        .security-card {
+            background: linear-gradient(180deg, rgba(255,255,255,0.03) 0%, transparent 100%);
+            border: 1px solid var(--glass-border);
+            border-top: 1px solid rgba(255,255,255,0.1);
+            border-radius: 20px;
+            padding: 32px;
+            text-align: center;
+            opacity: 0; transform: translateY(40px);
+            transition: all 0.4s var(--ease-out);
+        }
+        .security-card.visible { opacity: 1; transform: translateY(0); }
+        .security-card:hover { border-color: rgba(16, 185, 129, 0.4); } /* Subtle green glow on hover */
+
+        .sec-icon {
+            width: 56px; height: 56px;
+            margin: 0 auto 20px;
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success-green);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+        .sec-icon svg { width: 28px; height: 28px; }
+        .security-card h3 { font-size: 1.2rem; margin-bottom: 12px; font-weight: 600; }
+        .security-card p { font-size: 0.95rem; color: var(--text-muted); line-height: 1.6; }
+
+        /* ================= DOWNLOAD SECTION ================= */
+        .os-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px;
+        }
+
+        .os-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 40px 32px;
+            text-align: center;
+            backdrop-filter: blur(16px);
+            transition: all 0.4s var(--ease-out);
+            opacity: 0; transform: translateY(40px);
+        }
+        .os-card.visible { opacity: 1; transform: translateY(0); }
+        .os-card:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: var(--accent-blue);
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(59, 130, 246, 0.15);
+        }
+
+        .os-icon {
+            width: 64px; height: 64px; margin: 0 auto 24px;
+            fill: var(--text-main);
+        }
+        .os-card h3 { font-size: 1.5rem; margin-bottom: 8px; }
+        .os-card .version { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 24px; display: block; }
+        .os-card .btn { width: 100%; }
+
+        /* ================= CLOSING & FOOTER ================= */
+        .closing {
+            text-align: center; padding: 120px 0 80px 0;
+            border-top: 1px solid var(--glass-border);
+            margin-top: 40px;
+        }
+        .closing h2 { font-size: clamp(2rem, 4vw, 3.5rem); margin-bottom: 32px; font-weight: 800; letter-spacing: -1px; }
+
+        footer {
+            padding: 48px 0;
+            border-top: 1px solid var(--glass-border);
+            background: rgba(0,0,0,0.5);
+            position: relative;
+        }
+
+        .footer-disclaimer {
+            text-align: center;
+            max-width: 800px;
+            margin: 0 auto 32px auto;
+            padding: 24px;
+            background: rgba(255,255,255,0.02);
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .footer-disclaimer p {
+            color: #64748b;
+            font-size: 0.85rem;
+            line-height: 1.6;
+        }
+
+        .footer-content {
+            display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;
+        }
+        .footer-text { color: var(--text-muted); font-size: 0.9rem; }
+        .footer-links a { color: var(--text-muted); text-decoration: none; margin-left: 24px; font-size: 0.9rem; transition: 0.2s; }
+        .footer-links a:hover { color: white; }
+
+        /* ================= KEYFRAMES ================= */
+        @keyframes fadeUp {
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
+        }
+
+        @media (max-width: 768px) {
+            .nav-links { display: none; }
+            .showcase-container { height: 450px; }
+            .slide-caption { bottom: 16px; left: 16px; right: 16px; max-width: none; }
+            .carousel-nav { display: none; }
+            .screenshot-wrapper { width: 100%; height: 100%; border-radius: 0; border: none; }
+            .footer-content { flex-direction: column; text-align: center; justify-content: center; }
+            .footer-links a { margin: 0 12px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="ambient-glow"></div>
+    <canvas id="particles"></canvas>
+
+    <nav id="navbar">
+        <div class="container nav-content">
+            <a href="#" class="logo">Breeze.</a>
+            <div class="nav-links">
+                <a href="#features">Features</a>
+                <a href="#showcase">Interface</a>
+                <a href="#security">Security</a>
+                <a href="#download">Download</a>
+            </div>
+        </div>
+    </nav>
+
+    <section class="hero">
+        <div class="container">
+            <h1>Breeze Client</h1>
+            <p>The best Minecraft experience — optimized, beautiful, powerful. Leave the lag behind and elevate your gameplay with a truly modern client.</p>
+            <div class="hero-btns">
+                <a href="#download" class="btn btn-primary">Download Now</a>
+                <a href="https://discord.gg/yourinvite" target="_blank" class="btn btn-secondary">Join Discord</a>
+            </div>
+        </div>
+        <div class="scroll-indicator">
+            Scroll to explore
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M19 12l-7 7-7-7"/></svg>
+        </div>
+    </section>
+
+    <section id="features" class="section container">
+        <div class="section-header fade-element">
+            <h2>What is Breeze?</h2>
+            <p>Built from the ground up for maximum FPS and absolute ease of use.</p>
+        </div>
+        <div class="features-grid">
+            <div class="feature-card fade-element">
+                <div class="feature-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+                </div>
+                <h3>Performance Boost</h3>
+                <p>Advanced rendering optimizations and memory management ensure you get the absolute highest frames possible on any hardware.</p>
+            </div>
+            <div class="feature-card fade-element">
+                <div class="feature-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.24 12.24a6 6 0 0 0-8.49-8.49L5 10.5V19h8.5z"/><line x1="16" y1="8" x2="2" y2="22"/><line x1="17.5" y1="15" x2="9" y2="6.5"/></svg>
+                </div>
+                <h3>Built-in Cosmetics</h3>
+                <p>Express yourself with an integrated system for custom capes, wings, and skins visible to all other Breeze users instantly.</p>
+            </div>
+            <div class="feature-card fade-element">
+                <div class="feature-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
+                </div>
+                <h3>Smart Interface</h3>
+                <p>A clean, distraction-free in-game HUD. Toggle mods, adjust settings, and manage your experience without clunky menus.</p>
+            </div>
+            <div class="feature-card fade-element">
+                <div class="feature-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.59-9.21l-5.42 5.42"/></svg>
+                </div>
+                <h3>Seamless Updates</h3>
+                <p>Never worry about outdated mods. Our launcher automatically syncs configurations and updates in the background.</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="showcase" class="section container">
+        <div class="section-header fade-element">
+            <h2>Real Interface Preview</h2>
+            <p>A beautifully integrated system, built right into the core of the game.</p>
+        </div>
+        <div class="showcase-container fade-element" id="carousel">
+            <div class="carousel-track" id="track">
+                
+                <div class="slide">
+                    <div class="screenshot-wrapper">
+                        <img src="/assets/screenshots/launcher.png" alt="Breeze Launcher UI" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'800\' height=\'450\'><rect width=\'100%\' height=\'100%\' fill=\'%231e1b4b\'/><text x=\'50%\' y=\'50%\' fill=\'white\' font-family=\'sans-serif\' font-size=\'24\' text-anchor=\'middle\'>/assets/screenshots/launcher.png</text></svg>'">
+                    </div>
+                    <div class="slide-caption">
+                        <h4>Sleek Desktop Launcher</h4>
+                        <p>Manage your profiles, mods, and settings from a lightning-fast, native desktop application.</p>
+                    </div>
+                </div>
+
+                <div class="slide">
+                    <div class="screenshot-wrapper">
+                        <img src="/assets/screenshots/overlay.png" alt="In-Game Overlay" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'800\' height=\'450\'><rect width=\'100%\' height=\'100%\' fill=\'%230f172a\'/><text x=\'50%\' y=\'50%\' fill=\'white\' font-family=\'sans-serif\' font-size=\'24\' text-anchor=\'middle\'>/assets/screenshots/overlay.png</text></svg>'">
+                    </div>
+                    <div class="slide-caption">
+                        <h4>In-Game Performance Overlay</h4>
+                        <p>Track your FPS, CPS, coordinates, and ping with an unobtrusive, fully customizable HUD.</p>
+                    </div>
+                </div>
+
+                <div class="slide">
+                    <div class="screenshot-wrapper">
+                        <img src="/assets/screenshots/cosmetics.png" alt="Cosmetics Store" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'800\' height=\'450\'><rect width=\'100%\' height=\'100%\' fill=\'%2331111d\'/><text x=\'50%\' y=\'50%\' fill=\'white\' font-family=\'sans-serif\' font-size=\'24\' text-anchor=\'middle\'>/assets/screenshots/cosmetics.png</text></svg>'">
+                    </div>
+                    <div class="slide-caption">
+                        <h4>Cosmetics Hub</h4>
+                        <p>Equip custom capes, browse community cosmetics, and edit your skin instantly.</p>
+                    </div>
+                </div>
+
+            </div>
+            <div class="carousel-nav" id="carousel-dots">
+                <div class="dot active" onclick="goToSlide(0)"></div>
+                <div class="dot" onclick="goToSlide(1)"></div>
+                <div class="dot" onclick="goToSlide(2)"></div>
+            </div>
+        </div>
+    </section>
+
+    <section id="security" class="section container">
+        <div class="section-header fade-element">
+            <h2>Your account, perfectly secure.</h2>
+            <p>We take your privacy seriously. Breeze is built on strict security standards so you can play with total peace of mind.</p>
+        </div>
+        <div class="security-grid">
+            
+            <div class="security-card fade-element">
+                <div class="sec-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg>
+                </div>
+                <h3>Official Microsoft Auth</h3>
+                <p>We use the official Microsoft OAuth flow. You log in directly through Microsoft's secure portal—we never see or store your password.</p>
+            </div>
+
+            <div class="security-card fade-element">
+                <div class="sec-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                </div>
+                <h3>Zero Data Stored</h3>
+                <p>Your session tokens are stored locally on your own machine and fully encrypted. Your private login data never touches our servers.</p>
+            </div>
+
+            <div class="security-card fade-element">
+                <div class="sec-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                </div>
+                <h3>Trusted APIs</h3>
+                <p>Breeze communicates strictly through Mojang and Xbox Live verified APIs. There is zero risk of bans, and no unauthorized account sharing.</p>
+            </div>
+
+        </div>
+    </section>
+
+    <section id="download" class="section container">
+        <div class="section-header fade-element">
+            <h2>Download Breeze</h2>
+            <p>Select your operating system to get started.</p>
+        </div>
+        <div class="os-grid">
+            
+            <div class="os-card fade-element">
+                <svg class="os-icon" viewBox="0 0 24 24"><path d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-12.949-1.801"/></svg>
+                <h3>Windows</h3>
+                <span class="version" id="win-ver">Version 1.0 Beta — Latest</span>
+                <a href="/downloads/Breeze-Setup.exe" class="btn btn-primary">Download .exe</a>
+            </div>
+
+            <div class="os-card fade-element">
+                <svg class="os-icon" viewBox="0 0 24 24"><path d="M12 2C7.95 2 4.21 4.34 2.46 8c-1.8 3.76-1.57 8.2 1.34 11.38C5.45 21.17 7.7 22 10.1 22c.16 0 .32 0 .48-.02.43-.04.83-.24 1.1-.56.28-.31.39-.75.3-1.16-.14-.58-.69-1-1.3-1h-.1c-1.8 0-3.48-.68-4.73-1.92C4.52 16.03 3.86 14.15 4 12.18c.2-2.73 1.9-5.18 4.43-6.26 2.37-1.02 5.12-.76 7.27.7 1.76 1.2 2.87 3.2 2.87 5.34 0 3.21-2.45 6.05-5.64 6.36-1.08.11-2.18-.12-3.05-.73-.55-.38-.9-1.03-.9-1.72V10.5c0-1.1-.9-2-2-2s-2 .9-2 2v5.37c0 1.9 1.08 3.65 2.84 4.54.55.28 1.15.46 1.77.56.25.04.5.06.75.06 1.83 0 3.62-.64 5-1.82 2.05-1.74 3.24-4.24 3.24-6.88 0-2.9-1.56-5.63-4.1-7.23C15.82 2.7 13.9 2 12 2z"/></svg>
+                <h3>macOS</h3>
+                <span class="version" id="mac-ver">Version 1.0 Beta — Latest</span>
+                <a href="/downloads/Breeze-Setup.dmg" class="btn btn-primary">Download .dmg</a>
+            </div>
+
+            <div class="os-card fade-element">
+                <svg class="os-icon" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-2-5.5c0 .83-.67 1.5-1.5 1.5S7 15.33 7 14.5 7.67 13 8.5 13s1.5.67 1.5 1.5zm5.5-1.5c-.83 0-1.5.67-1.5 1.5s.67 1.5 1.5 1.5 1.5-.67 1.5-1.5-.67-1.5-1.5-1.5zM12 7c-1.66 0-3 1.34-3 3 0 .55.45 1 1 1s1-.45 1-1c0-.55.45-1 1-1s1 .45 1 1c0 .55.45 1 1 1s1-.45 1-1c0-1.66-1.34-3-3-3z"/></svg>
+                <h3>Linux</h3>
+                <span class="version" id="lin-ver">Version 1.0 Beta — Latest</span>
+                <a href="/downloads/Breeze-Linux.AppImage" class="btn btn-primary">Download .AppImage</a>
+            </div>
+
+        </div>
+    </section>
+
+    <section id="closing" class="closing container fade-element">
+        <h2>Built for performance.<br>Designed for players.</h2>
+        <a href="#download" class="btn btn-primary" style="padding: 18px 48px; font-size: 1.1rem;">Get Breeze Now</a>
+    </section>
+
+    <footer>
+        <div class="container">
+            <div class="footer-disclaimer">
+                <p>
+                    <strong>Legal Disclaimer:</strong> Breeze Client is an independent, community-driven launcher and modification project. 
+                    It is not affiliated with, endorsed by, or associated with Mojang AB, Microsoft Corporation, or any of their partners. 
+                    "Minecraft" is a trademark of Mojang Synergies AB. 
+                    Breeze Client does not distribute or host any official Minecraft game assets, binaries, or source code. 
+                    Users must possess a valid, officially purchased Microsoft/Minecraft account to use this software.
+                </p>
+            </div>
+            <div class="footer-content">
+                <div class="footer-text">
+                    &copy; 2024 Breeze Client. All rights reserved.
+                </div>
+                <div class="footer-links">
+                    <a href="#">Terms of Service</a>
+                    <a href="#">Privacy Policy</a>
+                    <a href="https://discord.gg/yourinvite" target="_blank">Discord Community</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // ================= NAVBAR SCROLL LOGIC =================
+        const navbar = document.getElementById('navbar');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) navbar.classList.add('scrolled');
+            else navbar.classList.remove('scrolled');
+        });
+
+        // ================= INTERSECTION OBSERVER (FADE IN) =================
+        const observerOptions = { root: null, rootMargin: '0px', threshold: 0.15 };
+        const observer = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.fade-element').forEach(el => observer.observe(el));
+
+        // ================= CAROUSEL LOGIC =================
+        let currentSlide = 0;
+        const track = document.getElementById('track');
+        const dots = document.querySelectorAll('.dot');
+        const totalSlides = 3;
+
+        function goToSlide(index) {
+            currentSlide = index;
+            track.style.transform = `translateX(-${index * 100}%)`;
+            dots.forEach(dot => dot.classList.remove('active'));
+            dots[index].classList.add('active');
+        }
+
+        // Auto rotate
+        setInterval(() => {
+            let nextSlide = (currentSlide + 1) % totalSlides;
+            goToSlide(nextSlide);
+        }, 5000);
+
+        // ================= LIGHTWEIGHT PARTICLE ENGINE =================
+        const canvas = document.getElementById('particles');
+        const ctx = canvas.getContext('2d');
+        let width, height, particlesArray = [];
+
+        function resizeCanvas() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * width;
+                this.y = Math.random() * height;
+                this.size = Math.random() * 2 + 0.5;
+                this.speedY = (Math.random() * 0.5) + 0.1; 
+                this.opacity = Math.random() * 0.4 + 0.1;
+                // Mostly purple and blue hues
+                const colors = ['139, 92, 246', '59, 130, 246', '255, 255, 255'];
+                this.color = colors[Math.floor(Math.random() * colors.length)];
+            }
+            update() {
+                this.y -= this.speedY; // Drift upwards
+                if (this.y < -10) {
+                    this.y = height + 10;
+                    this.x = Math.random() * width;
+                }
+            }
+            draw() {
+                ctx.fillStyle = `rgba(${this.color}, ${this.opacity})`;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        for (let i = 0; i < 40; i++) {
+            particlesArray.push(new Particle());
+        }
+
+        function animateParticles() {
+            ctx.clearRect(0, 0, width, height);
+            particlesArray.forEach(p => {
+                p.update();
+                p.draw();
+            });
+            requestAnimationFrame(animateParticles);
+        }
+        animateParticles();
+
+        // ================= VERSION FETCHING =================
+        async function fetchVersion() {
+            try {
+                // Attempt to fetch the actual version.json file
+                const res = await fetch('/version.json');
+                if (res.ok) {
+                    const data = await res.json();
+                    const versionText = `Version ${data.version || '1.0'} — Latest`;
+                    document.getElementById('win-ver').innerText = versionText;
+                    document.getElementById('mac-ver').innerText = versionText;
+                    document.getElementById('lin-ver').innerText = versionText;
+                }
+            } catch (e) {
+                // Fails silently; fallback is already hardcoded in HTML
+                console.log("Using fallback version info.");
+            }
+        }
+        fetchVersion();
+    </script>
+</body>
+</html>
