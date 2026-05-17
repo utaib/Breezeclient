@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Breeze Client | Partner Offers</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3363746666566736" crossorigin="anonymous"></script>
+
+    <style>
+        :root {
+            --bg-base: #05050a;
+            --text-main: #ffffff;
+            --text-muted: #94a3b8;
+            --glass-bg: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.08);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body, html {
+            background-color: var(--bg-base);
+            color: var(--text-main);
+            overflow-x: hidden;
+            cursor: none;
+        }
+
+        .cursor_dot {
+            width: 8px;
+            height: 8px;
+            background-color: white;
+            border-radius: 50%;
+            position: fixed;
+            top: 0; left: 0;
+            pointer-events: none;
+            z-index: 10000;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+        }
+
+        .cursor_outline {
+            width: 40px;
+            height: 40px;
+            border: 1px solid rgba(139, 92, 246, 0.5);
+            border-radius: 50%;
+            position: fixed;
+            top: 0; left: 0;
+            pointer-events: none;
+            z-index: 9999;
+            transform: translate(-50%, -50%);
+        }
+
+        @media (pointer: coarse) {
+            body, html { cursor: auto; }
+            .cursor_dot, .cursor_outline { display: none; }
+        }
+
+        .ambient_glow {
+            position: fixed;
+            top: -20vh; left: -10vw;
+            width: 120vw; height: 120vh;
+            background: radial-gradient(circle at 50% 0%, rgba(59, 130, 246, 0.12), transparent 50%),
+                        radial-gradient(circle at 80% 80%, rgba(139, 92, 246, 0.08), transparent 50%);
+            z-index: -3;
+            pointer-events: none;
+        }
+
+        .ad_grid {
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 0 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .ad_container {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 24px;
+            text-align: center;
+            backdrop-filter: blur(16px);
+        }
+
+        .ad_label {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            margin-bottom: 16px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .ad_box {
+            min-height: 100px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 12px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="cursor_dot" id="cursorDot"></div>
+    <div class="cursor_outline" id="cursorOutline"></div>
+    <div class="ambient_glow"></div>
+
+    <div class="ad_grid">
+        <div class="ad_container">
+            <p class="ad_label">Sponsored Partner</p>
+            <div class="ad_box">
+                <ins class="adsbygoogle"
+                     style="display:block"
+                     data-ad-client="ca-pub-3363746666566736"
+                     data-ad-slot="auto"
+                     data-ad-format="auto"
+                     data-full-width-responsive="true"></ins>
+                <script>
+                     (adsbygoogle = window.adsbygoogle || []).push({});
+                </script>
+            </div>
+        </div>
+
+        <div class="ad_container">
+            <p class="ad_label">Breeze Supporter</p>
+            <div class="ad_box">
+                <ins class="adsbygoogle"
+                     style="display:block"
+                     data-ad-client="ca-pub-3363746666566736"
+                     data-ad-slot="auto"
+                     data-ad-format="auto"
+                     data-full-width-responsive="true"></ins>
+                <script>
+                     (adsbygoogle = window.adsbygoogle || []).push({});
+                </script>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const cursorDot = document.getElementById('cursorDot');
+        const cursorOutline = document.getElementById('cursorOutline');
+
+        window.addEventListener('mousemove', (e) => {
+            cursorDot.style.transform = `translate(${e.clientX}px, ${e.clientY}px) translate(-50%, -50%)`;
+            setTimeout(() => {
+                cursorOutline.style.transform = `translate(${e.clientX}px, ${e.clientY}px) translate(-50%, -50%)`;
+            }, 50);
+        });
+    </script>
+</body>
+</html>
